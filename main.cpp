@@ -1,4 +1,3 @@
-#include <iostream>
 #include <cmath>
 #include <fstream>
 #include <chrono>
@@ -6,39 +5,47 @@
 #include <omp.h>
 #include<vector>
 #include<iterator>
-#include<fstream>
+#include <sstream>
+
+
 
 using namespace std;
 using namespace std::chrono;
 
 
-
-
-
 vector<Point> initalize_points(int num_point); 
-vector<Cluster> initalize_clusters(int num_cluster); 
+vector<Cluster> initalize_clusters(int num_cluster,vector<Point> points); 
 double distance(Point pt, Cluster cl);
 void assign_centroid(vector<Point> &points, vector<Cluster> &clusters);
 void update_centroids(vector<Cluster> &clusters);
 void draw_chart_gnu(vector<Point> &points);
 
 int main() {
+   
+    int num_threads;
+    printf("Insert number of threads\n");
+    cin>>num_threads;
+   
+    
+    omp_set_num_threads(num_threads);
+
+    
+    int num_point=100000;
+    int num_cluster=5;
+    int num_iterations= 20;
+    
+    
+    
+    //printf("Insert Number of points \n");
+    //cin>>num_point;
+    //printf("Insert number of clusters\n");
+    //cin>>num_cluster;
+    //printf("Insert number of iterations\n");
+    //cin>>num_iterations;
     auto start = std::chrono::system_clock::now();
-    int num_point;
-    int num_cluster;
-    int num_iterations;
-    
-    
-    printf("Insert Number of points \n");
-    cin>>num_point;
-    printf("Insert number of clusters\n");
-    cin>>num_cluster;
-    printf("Insert number of iterations\n");
-    cin>>num_iterations;
     
     vector<Point> points = initalize_points(num_point);
-
-    vector<Cluster> clusters = initalize_clusters(num_cluster);
+    vector<Cluster> clusters = initalize_clusters(num_cluster, points);
     
    for(int i=0;i<num_iterations;i++){
         assign_centroid(points, clusters);
@@ -58,8 +65,8 @@ int main() {
     
     
     ofstream outfile;
-    outfile.open("Results.txt", fstream::app);
-    outfile<<"Num points: "<<num_point<<endl<<"Num clusters: "<<num_cluster<<endl<<"Num iterations: "<<num_iterations<<endl<<"Total milliseconds: "<<duration<<endl;
+    outfile.open("/home/claudio/Parallel Computing/k-means parallel/Results/100000Point_Results.txt", fstream::app);
+    outfile<<"Num points: "<<num_point<<endl<<"Num clusters: "<<num_cluster<<endl<<"Num iterations: "<<num_iterations<<endl<<"Num threads: "<<num_threads<<endl<<"Total milliseconds: "<<duration<<endl;
     outfile.close();
 }
 
@@ -72,15 +79,34 @@ vector <Point> initalize_points(int num_point){
     //*****************************************************************************************************************
     //FILLS VECTOR OF POINTS RANDOMLY GENERATED
     //*****************************************************************************************************************
+    const string fname ="/home/claudio/Parallel Computing/k-means parallel/datasets/data_100000.csv";
+    vector<string>row;
+    string line, column;
+    vector<vector<string>> content;
+    fstream file(fname, ios::in);
+    if(file.is_open()){
+        while(getline(file, line)){
+            row.clear();
+            stringstream str(line); //Reads the file
+            while(getline(str, column, ',')){ //Takes each line and for each line each column
+                row.push_back(column); //Push each column in a vector of rows
+            }
+            content.push_back((row)); //Push each row in a matrix
+
+        }
+
+    }
     for(int i=0;i<num_point; i++){
-        Point pt (rand(), rand());
+        double coord_x = std::stod(content[i][0]);
+        double coord_y = std::stod(content[i][1]);
+        Point pt (coord_x,coord_y );
         points.push_back(pt);
         
     }
     return points;
 }
 
-vector <Cluster> initalize_clusters(int num_cluster){
+vector <Cluster> initalize_clusters(int num_cluster,vector<Point> points){
     //*****************************************************************************************************************
     //INITALIZAITONS
     //*****************************************************************************************************************
@@ -90,7 +116,8 @@ vector <Cluster> initalize_clusters(int num_cluster){
     //FILLS VECTOR OF CLUSTERS RANDOMLY GENERATED
     //*****************************************************************************************************************
     for(int i=0;i<num_cluster; i++){
-        Cluster cl (rand(), rand(), i);
+        int n = rand() % (int)points.size();
+        Cluster cl (points[n].get_coord_x(), points[n].get_coord_y(), i);
         clusters.push_back(cl);
     }
     return clusters;

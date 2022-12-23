@@ -1,0 +1,3 @@
+/home/claudio/Parallel Computing/k-means parallel/cmake-build-debug/CMakeFiles/k_means_parallel.dir
+/home/claudio/Parallel Computing/k-means parallel/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/claudio/Parallel Computing/k-means parallel/cmake-build-debug/CMakeFiles/rebuild_cache.dir
