@@ -2,6 +2,9 @@
 # **K-Means Algorithm with C++**
 A comparison between Sequential and Parallel version of K-Means with C++ using OpenMP.
 
+![image](https://user-images.githubusercontent.com/78537430/210811306-ebee6525-6491-4226-912b-e2ef79061884.png)
+
+
 ![image](https://user-images.githubusercontent.com/78537430/208104365-09541455-46ef-4812-b2a9-bc291d81ddcc.png)
 
 This task aim to parrtition n points into k clusters in which each point belongs to the cluster with the closer mean. It is based on the following steps:
